@@ -18,11 +18,17 @@ emitter.on('info', info => {
 	console.log(info.message);
 });
 
-emitter.clone('.tmp/test-repo').then(() => {
+emitter.clone('.tmp/test-repo').then((destpath) => {
+  console.log('destpath: ', destpath);
 	console.log('done');
 }).catch((err) => {
   console.log('err: ', err);
 });
+
+emitter.clone('.tmp/xxx', true).then((destpath) => {
+  console.log('destpath: ', destpath);
+
+})
 
 // const subdir = 'tech-ui-master/templates';
 // const dist = './dest';

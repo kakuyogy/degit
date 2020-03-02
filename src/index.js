@@ -85,12 +85,14 @@ class Degit extends EventEmitter {
 		return directives;
 	}
 
-	async clone(dest) {
-		this._checkDirIsEmpty(dest);
-
-		const { repo } = this;
-
-		const dir = path.join(base, repo.site, repo.user, repo.name);
+	async clone(dest, joinWithTmpDir=false) {
+    const { repo } = this;
+    
+    const dir = path.join(base, repo.site, repo.user, repo.name);
+    if(joinWithTmpDir) {
+      dest = path.join(dir, dest);
+    }
+    this._checkDirIsEmpty(dest);
 
 		if (this.mode === 'tar') {
 			await this._cloneWithTar(dir, dest);
@@ -116,7 +118,8 @@ class Degit extends EventEmitter {
 			if (this._hasStashed === true) {
 				unstashFiles(dir, dest);
 			}
-		}
+    }
+    return dest;
 	}
 
 	remove(dir, dest, action) {
