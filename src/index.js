@@ -244,11 +244,14 @@ class Degit extends EventEmitter {
 
 		const cached = tryRequire(path.join(dir, 'map.json')) || {};
 
-		const hash = this.cache
+		let hash = this.cache
 			? this._getHashFromCache(repo, cached)
 			: await this._getHash(repo, cached);
 
-		const subdir = repo.subdir ? `${repo.name}-${hash}${repo.subdir}` : null;
+		const isAlibabaSite = repo.site === 'gitlab.alibaba-inc' || repo.site === 'gitlab.alipay-inc';
+		const subdir = repo.subdir
+			? `${repo.name}-${hash}${isAlibabaSite ? `-${hash}` : ''}${repo.subdir}`
+			: null;
 
 		if (!hash) {
 			// TODO 'did you mean...?'
@@ -260,7 +263,7 @@ class Degit extends EventEmitter {
 
 		const file = `${dir}/${hash}.tar.gz`;
 		const url =
-			repo.site === 'gitlab'
+			repo.site === 'gitlab' || repo.site === 'gitlab.alibaba-inc' || repo.site === 'gitlab.alipay-inc'
 				? `${repo.url}/repository/archive.tar.gz?ref=${hash}`
 				: repo.site === 'bitbucket'
 				? `${repo.url}/get/${hash}.tar.gz`
@@ -319,7 +322,14 @@ class Degit extends EventEmitter {
 	}
 }
 
-const supported = new Set(['github', 'gitlab', 'bitbucket', 'git.sr.ht']);
+const supported = new Set([
+	'github',
+	'gitlab',
+	'bitbucket',
+	'git.sr.ht',
+  'gitlab.alibaba-inc',
+  'gitlab.alipay-inc'
+]);
 
 function parse(src) {
 	const match = /^(?:(?:https:\/\/)?([^:/]+\.[^:/]+)\/|git@([^:/]+)[:/]|([^/]+):)?([^/\s]+)\/([^/\s#]+)(?:((?:\/[^/\s#]+)+))?(?:\/)?(?:#(.+))?/.exec(
@@ -373,7 +383,10 @@ async function untar(file, dest, subdir = null) {
 
 async function fetchRefs(repo) {
 	try {
-		const { stdout } = await exec(`git ls-remote ${repo.url}`);
+		const isAlibabaSite = repo.site === 'gitlab.alibaba-inc' || repo.site === 'gitlab.alipay-inc';
+		const { stdout } = await exec(
+			`git ls-remote ${repo.url}${isAlibabaSite ? '.git' : ''}`
+		);
 
 		return stdout
 			.split('\n')
@@ -388,7 +401,7 @@ async function fetchRefs(repo) {
 					};
 				}
 
-				const match = /refs\/(\w+)\/(.+)/.exec(ref);
+				const match = /refs\/([\w\-]+)\/(.+)/.exec(ref);
 				if (!match)
 					throw new DegitError(`could not parse ${ref}`, {
 						code: 'BAD_REF'

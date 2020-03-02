@@ -6,7 +6,6 @@ import pkg from './package.json';
 export default {
 	input: {
 		index: 'src/index.js',
-		bin: 'src/bin.js'
 	},
 	output: {
 		dir: 'dist',

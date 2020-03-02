@@ -1,30 +1,25 @@
 {
-	"name": "degit",
-	"version": "2.8.0",
+	"name": "@ali/degit",
+	"version": "1.0.1",
 	"engines": {
 		"node": ">=8.0.0"
 	},
 	"description": "Straightforward project scaffolding",
-	"main": "index.js",
-	"bin": {
-		"degit": "bin.js"
-	},
+	"main": "./dist/index.js",
 	"scripts": {
 		"lint": "eslint --color --ignore-path .gitignore .",
 		"dev": "npm run build -- --watch",
 		"build": "rollup -c",
+		"watch": "rollup -c -w",
 		"test": "mocha",
 		"pretest": "npm run build",
 		"prepublishOnly": "npm test"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/Rich-Harris/degit.git"
-	},
 	"keywords": [
 		"scaffolding",
 		"template",
-		"git"
+    "git",
+    "Alibaba"
 	],
 	"author": "Rich Harris",
 	"license": "MIT",
@@ -57,8 +52,6 @@
 		"tiny-glob": "0.2.6"
 	},
 	"files": [
-		"index.js",
-		"bin.js",
 		"help.md",
 		"dist"
 	],
@@ -76,5 +69,8 @@
 			"prettier --write",
 			"git add"
 		]
-	}
+  },
+  "publishConfig": {
+    "registry": "https://registry.npm.alibaba-inc.com"
+  }
 }
